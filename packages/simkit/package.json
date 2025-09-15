@@ -46,10 +46,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fallom/simkit.git",
+    "url": "https://github.com/fallomai/simkit.git",
     "directory": "packages/simkit"
   },
-  "homepage": "https://github.com/fallom/simkit#readme",
+  "homepage": "https://github.com/fallomai/simkit#readme",
   "keywords": [
     "simulation",
     "typescript",
