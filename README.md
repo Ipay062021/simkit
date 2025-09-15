@@ -7,7 +7,28 @@
 
 > 🤖 **A TypeScript simulation framework for testing and running AI agents**
 
-At its core, SimKit provides a **tick-based loop** with **OpenTelemetry support** - perfect for AI agent development, testing, and observability.
+## What is SimKit?
+
+SimKit lets you build, test, and run AI agents in your own custom simulated environments. It gives you a simple game loop for running agents step-by-step, supports multiple agents, and includes built-in tools (OTEL) for tracking what happens during your simulations.
+
+### Agent Agnostic & No Vendor Lock-in
+
+SimKit works with any AI agent or LLM, no lock-in. Use your own models and run everything locally. OTEL logs can be saved to a local file or sent to a remote server.
+
+### Why Use Simulations?
+
+Simulations let you see how your AI agents perform on real world tasks, step by step, in a safe and controlled way.
+
+Traditional evals are great for simple tasks, but they don't give you the full picture. You can't see how your agents handle:
+
+- 🎯 Multi-step tasks that need planning and memory
+- 🛠️ Lots of different tools and actions
+- 🌍 Realistic data and changing situations
+- ⚡ Decisions that matter over time
+- 🔄 Long-term planning and decision-making
+- 📚 Processing and reasoning over large amounts of context and information
+
+Surprisingly, most AI agents begin to fail when they are asked to do anything more than a few simple tasks.
 
 ## 🔄 Core: The Simulation Loop
 
@@ -16,30 +37,61 @@ SimKit's heart is a simple but powerful tick-based loop:
 ```typescript
 import { createSimulation, type LoopState } from "@fallom/simkit/simulation";
 
-interface MyState extends LoopState {
-  agentMoney: number;
-  day: number;
+interface SupportTestState extends LoopState {
+  totalIssues: number;
+  resolvedIssues: number;
+  averageResponseTime: number;
+  satisfactionScores: number[];
 }
 
-const simulation = createSimulation<MyState>({
-  maxTicks: 100,
-  initialState: { agentMoney: 1000, day: 1 },
+const customerIssues = [
+  "My account is locked and I can't access my files",
+  "Billing error - charged twice for same month", 
+  "App crashes every time I try to upload",
+  "Can't find my downloaded files anywhere"
+];
+
+const simulation = createSimulation<SupportTestState>({
+  maxTicks: 10,
+  initialState: { totalIssues: 0, resolvedIssues: 0, averageResponseTime: 0, satisfactionScores: [] },
   
   onTick: async (state) => {
-    // Your AI agent logic here
-    console.log(`Day ${state.day}: Agent has $${state.agentMoney}`);
+    // Get today's customer issues
+    const dailyIssues = getRandomIssues(customerIssues, 2);
     
-    // Return true to continue, false to end
-    return state.day < 30;
+    for (const issue of dailyIssues) {
+      const startTime = Date.now();
+      
+      // Test your AI support agent
+      const agentResponse = await supportAgent.handle(issue);
+      
+      const responseTime = Date.now() - startTime;
+      const satisfaction = scoreResponse(agentResponse, issue);
+      
+      state.totalIssues++;
+      if (satisfaction > 7) state.resolvedIssues++;
+      state.satisfactionScores.push(satisfaction);
+      
+      // Update running averages
+      const avgSatisfaction = state.satisfactionScores.reduce((a,b) => a+b, 0) / state.satisfactionScores.length;
+      const resolutionRate = (state.resolvedIssues / state.totalIssues) * 100;
+      
+      console.log(`Resolution Rate: ${resolutionRate.toFixed(1)}% | Avg Satisfaction: ${avgSatisfaction.toFixed(1)}/10`);
+    }
+    
+    return state.tick < 9; // Test for 10 days
   },
   
-  onEnd: (state, reason) => {
-    console.log(`Simulation ended: ${reason}`);
-  },
+  onEnd: (state) => {
+    const finalSatisfaction = state.satisfactionScores.reduce((a,b) => a+b, 0) / state.satisfactionScores.length;
+    console.log(`🎯 Final Results: ${((state.resolvedIssues/state.totalIssues)*100).toFixed(1)}% resolution rate, ${finalSatisfaction.toFixed(1)}/10 satisfaction`);
+  }
 });
 
 await simulation.run();
 ```
+
+**What's happening here?** Each tick simulates a day of customer support. SimKit feeds random issues to your AI agent, measures response quality and speed, then tracks KPIs over time. Perfect for A/B testing different models, regression testing after prompt changes, or measuring performance before production deployment.
 
 ## 🤖 Built for AI Agents
 
@@ -57,22 +109,29 @@ const currentState = getSimState<MyState>();
 ```
 
 ### Deterministic Testing
-Reproduce exact scenarios with seeded randomness:
+Reproduce exact scenarios with seeded randomness - perfect for fair model comparisons:
 
 ```typescript
 import { initializeRandom, choice, shuffle } from "@fallom/simkit/random";
 
-// Set seed for reproducible results
-initializeRandom(12345);
+// Test Model A
+initializeRandom(12345); // Same seed = same test scenarios
+const modelA_results = await testSupportAgent(modelA);
 
-// Use deterministic random functions
-const randomCustomer = choice(['Alice', 'Bob', 'Carol']);
-const shuffledItems = shuffle(inventory);
+// Test Model B with identical scenarios
+initializeRandom(12345); // Reset to same seed
+const modelB_results = await testSupportAgent(modelB);
+
+// Now you can fairly compare: both models faced the exact same issues
+console.log(`Model A: ${modelA_results.satisfaction}/10`);
+console.log(`Model B: ${modelB_results.satisfaction}/10`);
 ```
+
+**Why this matters:** Without seeded randomness, Model A might get easy customer issues while Model B gets hard ones, making comparison meaningless. SimKit ensures every model faces identical test scenarios.
 
 ## 📊 OpenTelemetry Integration
 
-Built-in observability for AI agent debugging:
+Built-in observability for AI agent debugging with **zero vendor lock-in**:
 
 ```typescript
 import { trace } from "@opentelemetry/api";
@@ -81,11 +140,14 @@ import { trace } from "@opentelemetry/api";
 const tracer = trace.getTracer("my-simulation");
 const span = tracer.startSpan("agent-decision");
 span.setAttributes({
-  "agent.action": "buy_item",
-  "simulation.day": state.day,
+  "agent.action": "support_response",
+  "simulation.tick": state.tick,
+  "response.satisfaction": 8.5
 });
 span.end();
 ```
+
+**Send telemetry anywhere:** Export to your own servers, store in local files, or pipe to any OpenTelemetry-compatible service. No vendor lock-in - you own your data.
 
 ## ✨ Key Features
 
