@@ -49,7 +49,7 @@
     "url": "git+https://github.com/fallomai/simkit.git",
     "directory": "packages/simkit"
   },
-  "homepage": "https://github.com/fallomai/simkit#readme",
+  "homepage": "https://fallom.com",
   "keywords": [
     "simulation",
     "typescript",
