@@ -1,135 +1,133 @@
-# Turborepo starter
+# SimKit
 
-This Turborepo starter is maintained by the Turborepo core team.
+[![npm version](https://badge.fury.io/js/%40fallom%2Fsimkit.svg)](https://badge.fury.io/js/%40fallom%2Fsimkit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Using this example
+A TypeScript simulation framework with built-in telemetry, deterministic randomness, and state management.
 
-Run the following command:
+## Features
 
-```sh
-npx create-turbo@latest
+- 🔄 **Simulation Loop**: Easy-to-use simulation runner with tick-based execution
+- 📊 **Built-in Telemetry**: OpenTelemetry integration for observability
+- 🎲 **Seeded Random**: Deterministic random number generation for reproducible results
+- 🏗️ **State Management**: Global state utilities for complex simulations
+- 📦 **Modular**: Import only what you need with tree-shakable exports
+- 🤖 **AI Ready**: Perfect for AI-powered simulations and agent-based modeling
+
+## Installation
+
+```bash
+npm install @fallom/simkit
+# or
+bun add @fallom/simkit
 ```
 
-## What's inside?
+## Quick Start
 
-This Turborepo includes the following packages/apps:
+```typescript
+import { createSimulation, type LoopState } from "@fallom/simkit/simulation";
 
-### Apps and Packages
+interface MyState extends LoopState {
+  score: number;
+  energy: number;
+}
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+const simulation = createSimulation<MyState>({
+  maxTicks: 10,
+  initialState: { score: 0, energy: 100 },
+  onTick: async (state) => {
+    console.log(`Tick ${state.tick}: Score=${state.score}, Energy=${state.energy}`);
+    
+    // Your simulation logic here
+    state.score += 5;
+    state.energy -= 10;
+    
+    return state.energy > 0; // Continue if energy > 0
+  },
+  onEnd: (state, reason) => {
+    console.log(`Final score: ${state.score}`);
+  },
+});
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+await simulation.run();
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+## Examples
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+### 🤖 AI-Powered Energy Management
+See our [Energy AI Example](./apps/examples/energy-ai/) - an intelligent agent that uses OpenRouter AI to make strategic decisions in a resource management simulation.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+```bash
+cd apps/examples/energy-ai
+bun install
+bun run energy-ai
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+Features demonstrated:
+- AI decision-making with tool calling
+- Strategic resource management
+- Telemetry tracking
+- Clean separation of concerns
+
+## Documentation
+
+- **📖 [Full API Documentation](./packages/simkit/README.md)**
+- **🤖 [AI Example Tutorial](./apps/examples/energy-ai/README.md)**
+
+## Repository Structure
+
+This is a Turborepo monorepo containing:
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+packages/
+├── simkit/           # Core simulation framework
+└── ...
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+apps/
+└── examples/
+    └── energy-ai/    # AI-powered simulation example
 ```
 
-### Remote Caching
+## Development
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+```bash
+# Install dependencies
+bun install
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+# Build all packages
+bun run build
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+# Run in development mode
+bun run dev
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+# Format code
+bun run format
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## Publishing to NPM
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+The `@fallom/simkit` package is available on NPM. To publish updates:
 
+```bash
+# Build the package
+cd packages/simkit
+bun run build
+
+# Bump version
+npm version patch|minor|major
+
+# Publish to NPM
+npm publish
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
+## License
 
-## Useful Links
+MIT © [Fallom](https://github.com/fallom)
 
-Learn more about the power of Turborepo:
+## Contributing
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+Contributions welcome! Please read our contributing guidelines and submit PRs.
+
+---
+
+**Built with ❤️ for the simulation community**

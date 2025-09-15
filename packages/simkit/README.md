@@ -2,6 +2,8 @@
 
 A TypeScript simulation framework with built-in telemetry, deterministic randomness, and state management.
 
+> 📖 **Main Documentation**: See the [main repository README](../../README.md) for overview and examples.
+
 ## Features
 
 - 🔄 **Simulation Loop**: Easy-to-use simulation runner with tick-based execution

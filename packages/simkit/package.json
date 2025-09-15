@@ -42,5 +42,21 @@
     "@opentelemetry/core": "^2.1.0",
     "@opentelemetry/sdk-node": "^0.205.0",
     "@opentelemetry/sdk-trace-base": "^2.1.0"
-  }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fallom/simkit.git",
+    "directory": "packages/simkit"
+  },
+  "homepage": "https://github.com/fallom/simkit#readme",
+  "keywords": [
+    "simulation",
+    "typescript",
+    "telemetry",
+    "random",
+    "state-management",
+    "ai",
+    "agent-based-modeling"
+  ]
 }
