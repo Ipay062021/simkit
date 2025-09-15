@@ -46,7 +46,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fallomai/simkit.git",
+    "url": "git+https://github.com/fallomai/simkit.git",
     "directory": "packages/simkit"
   },
   "homepage": "https://github.com/fallomai/simkit#readme",
