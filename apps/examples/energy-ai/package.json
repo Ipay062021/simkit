@@ -1,0 +1,21 @@
+{
+  "name": "energy-ai",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "energy-ai": "bun run src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@fallom/simkit": "workspace:*",
+    "@openrouter/ai-sdk-provider": "^1.2.0",
+    "ai": "^5.0.44",
+    "zod": "^4.1.8"
+  }
+}
