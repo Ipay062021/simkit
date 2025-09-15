@@ -1,20 +1,104 @@
 # SimKit
 
-[![npm version](https://badge.fury.io/js/%40fallom%2Fsimkit.svg)](https://badge.fury.io/js/%40fallom%2Fsimkit)
+[![npm version](https://badge.fury.io/js/%40fallom%2Fsimkit.svg)](https://www.npmjs.com/package/@fallom/simkit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Downloads](https://img.shields.io/npm/dm/@fallom/simkit.svg)](https://www.npmjs.com/package/@fallom/simkit)
 
-A TypeScript simulation framework with built-in telemetry, deterministic randomness, and state management.
+> 🤖 **A TypeScript simulation framework for testing and running AI agents**
 
-## Features
+At its core, SimKit provides a **tick-based loop** with **OpenTelemetry support** - perfect for AI agent development, testing, and observability.
 
-- 🔄 **Simulation Loop**: Easy-to-use simulation runner with tick-based execution
-- 📊 **Built-in Telemetry**: OpenTelemetry integration for observability
-- 🎲 **Seeded Random**: Deterministic random number generation for reproducible results
-- 🏗️ **State Management**: Global state utilities for complex simulations
-- 📦 **Modular**: Import only what you need with tree-shakable exports
-- 🤖 **AI Ready**: Perfect for AI-powered simulations and agent-based modeling
+## 🔄 Core: The Simulation Loop
 
-## Installation
+SimKit's heart is a simple but powerful tick-based loop:
+
+```typescript
+import { createSimulation, type LoopState } from "@fallom/simkit/simulation";
+
+interface MyState extends LoopState {
+  agentMoney: number;
+  day: number;
+}
+
+const simulation = createSimulation<MyState>({
+  maxTicks: 100,
+  initialState: { agentMoney: 1000, day: 1 },
+  
+  onTick: async (state) => {
+    // Your AI agent logic here
+    console.log(`Day ${state.day}: Agent has $${state.agentMoney}`);
+    
+    // Return true to continue, false to end
+    return state.day < 30;
+  },
+  
+  onEnd: (state, reason) => {
+    console.log(`Simulation ended: ${reason}`);
+  },
+});
+
+await simulation.run();
+```
+
+## 🤖 Built for AI Agents
+
+### Global State Access
+AI agents need access to simulation state from anywhere:
+
+```typescript
+import { setSimState, getSimState } from "@fallom/simkit/state";
+
+// In your simulation loop
+setSimState(state);
+
+// In your AI tools
+const currentState = getSimState<MyState>();
+```
+
+### Deterministic Testing
+Reproduce exact scenarios with seeded randomness:
+
+```typescript
+import { initializeRandom, choice, shuffle } from "@fallom/simkit/random";
+
+// Set seed for reproducible results
+initializeRandom(12345);
+
+// Use deterministic random functions
+const randomCustomer = choice(['Alice', 'Bob', 'Carol']);
+const shuffledItems = shuffle(inventory);
+```
+
+## 📊 OpenTelemetry Integration
+
+Built-in observability for AI agent debugging:
+
+```typescript
+import { trace } from "@opentelemetry/api";
+
+// SimKit automatically captures spans for you
+const tracer = trace.getTracer("my-simulation");
+const span = tracer.startSpan("agent-decision");
+span.setAttributes({
+  "agent.action": "buy_item",
+  "simulation.day": state.day,
+});
+span.end();
+```
+
+## ✨ Key Features
+
+| Feature | Why It Matters for AI |
+|---------|----------------------|
+| 🔄 **Tick-Based Loop** | Step-by-step agent execution with full control |
+| 📊 **OpenTelemetry** | Track agent decisions and debug complex behaviors |
+| 🎲 **Seeded Random** | Reproduce exact scenarios for testing and validation |
+| 🏗️ **Global State** | AI tools can access simulation state from anywhere |
+| 🔧 **TypeScript** | Full type safety for complex agent interactions |
+| ⚡ **Bun Optimized** | Fast execution for compute-intensive agent simulations |
+
+## 📦 Installation
 
 ```bash
 npm install @fallom/simkit
@@ -22,112 +106,70 @@ npm install @fallom/simkit
 bun add @fallom/simkit
 ```
 
-## Quick Start
+## 🎮 Examples
 
-```typescript
-import { createSimulation, type LoopState } from "@fallom/simkit/simulation";
-
-interface MyState extends LoopState {
-  score: number;
-  energy: number;
-}
-
-const simulation = createSimulation<MyState>({
-  maxTicks: 10,
-  initialState: { score: 0, energy: 100 },
-  onTick: async (state) => {
-    console.log(`Tick ${state.tick}: Score=${state.score}, Energy=${state.energy}`);
-    
-    // Your simulation logic here
-    state.score += 5;
-    state.energy -= 10;
-    
-    return state.energy > 0; // Continue if energy > 0
-  },
-  onEnd: (state, reason) => {
-    console.log(`Final score: ${state.score}`);
-  },
-});
-
-await simulation.run();
-```
-
-## Examples
-
-### 🤖 AI-Powered Energy Management
-See our [Energy AI Example](./apps/examples/energy-ai/) - an intelligent agent that uses OpenRouter AI to make strategic decisions in a resource management simulation.
+### 🚀 Getting Started: Energy AI
+**Simple agent making strategic decisions**
 
 ```bash
 cd apps/examples/energy-ai
-bun install
-bun run energy-ai
+bun install && bun run start
 ```
 
-Features demonstrated:
-- AI decision-making with tool calling
-- Strategic resource management
-- Telemetry tracking
-- Clean separation of concerns
+A straightforward example showing:
+- AI agent with tool calling
+- Basic state management
+- OpenTelemetry integration
 
-## Documentation
+### 🏆 Advanced: Pawn Shop Simulation  
+**Complex multi-agent economic simulation**
 
-- **📖 [Full API Documentation](./packages/simkit/README.md)**
-- **🤖 [AI Example Tutorial](./apps/examples/energy-ai/README.md)**
+A comprehensive example demonstrating SimKit's full capabilities:
+- **Multi-agent system** - Shop owner + customer agents
+- **Complex state management** - Inventory, trades, conversations
+- **Deterministic scenarios** - Seeded randomness for testing
+- **Rich telemetry** - Custom spans and detailed logging
+- **Tool ecosystem** - AI agents with 10+ specialized tools
 
-## Repository Structure
+*Perfect for understanding how to build production-grade agent simulations.*
 
-This is a Turborepo monorepo containing:
+## 🚀 Why SimKit for AI Development?
 
-```
-packages/
-├── simkit/           # Core simulation framework
-└── ...
+| Traditional Approach | With SimKit |
+|----------------------|-------------|
+| ❌ Manual loop management | ✅ Built-in tick-based execution |
+| ❌ No observability | ✅ OpenTelemetry integration |
+| ❌ Non-deterministic testing | ✅ Seeded randomness |
+| ❌ Complex state sharing | ✅ Global state management |
+| ❌ Manual telemetry setup | ✅ Automatic span collection |
 
-apps/
-└── examples/
-    └── energy-ai/    # AI-powered simulation example
-```
+## 📖 Learn More
 
-## Development
+- **[📦 Core Package Docs](./packages/simkit/README.md)** - Full API reference
+- **[🚀 Energy AI Tutorial](./apps/examples/energy-ai/README.md)** - Simple getting started guide
+- **[🏆 Pawn Shop Deep Dive](./examples/pawn/README.md)** - Advanced multi-agent patterns
+
+## 🏗️ Development
 
 ```bash
 # Install dependencies
 bun install
 
-# Build all packages
+# Build all packages  
 bun run build
-
-# Run in development mode
-bun run dev
 
 # Format code
 bun run format
 ```
 
-## Publishing to NPM
-
-The `@fallom/simkit` package is available on NPM. To publish updates:
-
-```bash
-# Build the package
-cd packages/simkit
-bun run build
-
-# Bump version
-npm version patch|minor|major
-
-# Publish to NPM
-npm publish
-```
-
-## License
-
-MIT © [Fallom](https://github.com/fallom)
-
-## Contributing
-
-Contributions welcome! Please read our contributing guidelines and submit PRs.
-
 ---
 
-**Built with ❤️ for the simulation community**
+<div align="center">
+
+[![NPM Package](https://img.shields.io/npm/v/@fallom/simkit?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@fallom/simkit)
+
+**🚀 Built for the AI simulation community**
+
+[📖 Documentation](./packages/simkit/README.md) • [🎮 Examples](./apps/examples/) • [🐛 Issues](https://github.com/fallomai/simkit/issues)
+
+</div>
