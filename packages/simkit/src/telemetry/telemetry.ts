@@ -1,35 +1,87 @@
-import type { SpanExporter, ReadableSpan } from "@opentelemetry/sdk-trace-base";
 import type { ExportResult } from "@opentelemetry/core";
 import { ExportResultCode as ExportResultCodeValue } from "@opentelemetry/core";
 
-// Simple file-based telemetry exporter that writes JSON Lines
-export class FileLogDrainExporter implements SpanExporter {
+// Comprehensive file-based telemetry exporter that writes detailed JSON Lines
+export class FileLogDrainExporter {
   private logFile: string;
 
   constructor(logFile: string = "./telemetry.jsonl") {
     this.logFile = logFile;
   }
 
-  export(
-    spans: ReadableSpan[],
-    resultCallback: (result: ExportResult) => void
-  ): void {
-    const logEntries = spans.map((span) => ({
-      timestamp: new Date().toISOString(),
-      traceId: span.spanContext().traceId,
-      spanId: span.spanContext().spanId,
-      name: span.name,
-      duration:
-        (span.endTime[0] - span.startTime[0]) * 1000 +
-        (span.endTime[1] - span.startTime[1]) / 1000000,
-      status: span.status.code,
-      attributes: span.attributes,
-      events: span.events.map((event) => ({
-        name: event.name,
-        attributes: event.attributes,
-        time: event.time,
-      })),
-    }));
+  export(spans: any[], resultCallback: (result: ExportResult) => void): void {
+    const logEntries = spans.map((span) => {
+      const spanContext = span.spanContext();
+      const startTimeMs =
+        span.startTime[0] * 1000 + span.startTime[1] / 1000000;
+      const endTimeMs = span.endTime[0] * 1000 + span.endTime[1] / 1000000;
+
+      return {
+        // Core telemetry data
+        timestamp: new Date().toISOString(),
+        traceId: spanContext.traceId,
+        spanId: spanContext.spanId,
+        parentSpanId: span.parentSpanId || undefined,
+        name: span.name,
+        kind: span.kind,
+
+        // Timing information
+        startTime: new Date(startTimeMs).toISOString(),
+        endTime: new Date(endTimeMs).toISOString(),
+        duration: endTimeMs - startTimeMs,
+
+        // Status and error information
+        status: {
+          code: span.status.code,
+          message: span.status.message,
+        },
+
+        // Resource information
+        resource: span.resource?.attributes || {},
+
+        // Instrumentation scope
+        instrumentationScope: {
+          name:
+            span.instrumentationLibrary?.name ||
+            span.instrumentationScope?.name ||
+            "unknown",
+          version:
+            span.instrumentationLibrary?.version ||
+            span.instrumentationScope?.version ||
+            undefined,
+          schemaUrl:
+            span.instrumentationLibrary?.schemaUrl ||
+            span.instrumentationScope?.schemaUrl ||
+            undefined,
+        },
+
+        // Attributes (tags/labels)
+        attributes: span.attributes,
+
+        // Events (structured logs within the span)
+        events:
+          span.events?.map((event: any) => ({
+            name: event.name,
+            attributes: event.attributes,
+            time: new Date(
+              event.time[0] * 1000 + event.time[1] / 1000000
+            ).toISOString(),
+          })) || [],
+
+        // Links to other spans
+        links:
+          span.links?.map((link: any) => ({
+            traceId: link.context.traceId,
+            spanId: link.context.spanId,
+            attributes: link.attributes,
+          })) || [],
+
+        // Additional metadata
+        droppedAttributesCount: span.droppedAttributesCount || 0,
+        droppedEventsCount: span.droppedEventsCount || 0,
+        droppedLinksCount: span.droppedLinksCount || 0,
+      };
+    });
 
     // Write to file (using Bun's built-in file writing)
     const logData =
