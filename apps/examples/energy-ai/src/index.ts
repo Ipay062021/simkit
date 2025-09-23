@@ -1,4 +1,5 @@
 import { createSimulation, type LoopState } from "@fallom/simkit/simulation";
+import { initTelemetry } from "@fallom/simkit";
 import { runEnergyAgent } from "./agent";
 import { createStatePrompt } from "./prompts";
 
@@ -11,6 +12,11 @@ interface EnergyAIState extends LoopState {
 
 // Energy simulation using AI agent
 export async function runEnergyAISimulation() {
+  initTelemetry({
+    logFile: "./energy-ai-logs.json",
+    serviceName: "energy-ai-simulation",
+    appendToFile: false
+  });
   const simulation = createSimulation<EnergyAIState>({
     maxTicks: 10,
 

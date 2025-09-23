@@ -4,9 +4,42 @@ import { ExportResultCode as ExportResultCodeValue } from "@opentelemetry/core";
 // Comprehensive file-based telemetry exporter that writes detailed JSON Lines
 export class FileLogDrainExporter {
   private logFile: string;
+  private appendToFile: boolean;
 
-  constructor(logFile: string = "./telemetry.jsonl") {
-    this.logFile = logFile;
+  constructor(
+    logFile: string = "./telemetry.jsonl",
+    appendToFile: boolean = false
+  ) {
+    this.appendToFile = appendToFile;
+    this.logFile = appendToFile
+      ? logFile
+      : this.generateUniqueFilename(logFile);
+  }
+
+  getLogFile(): string {
+    return this.logFile;
+  }
+
+  private generateUniqueFilename(basePath: string): string {
+    // Parse the base filename and extension
+    const lastDotIndex = basePath.lastIndexOf(".");
+    const baseNameWithoutExt =
+      lastDotIndex !== -1 ? basePath.slice(0, lastDotIndex) : basePath;
+    const extension = lastDotIndex !== -1 ? basePath.slice(lastDotIndex) : "";
+
+    // Check if base file exists
+    let counter = 0;
+    let filename = basePath;
+
+    // Keep incrementing until we find a filename that doesn't exist
+    // Use synchronous file system check instead of Bun.file().exists()
+    const fs = require("fs");
+    while (fs.existsSync(filename)) {
+      counter++;
+      filename = `${baseNameWithoutExt}_${counter}${extension}`;
+    }
+
+    return filename;
   }
 
   export(spans: any[], resultCallback: (result: ExportResult) => void): void {
@@ -87,10 +120,10 @@ export class FileLogDrainExporter {
     const logData =
       logEntries.map((entry) => JSON.stringify(entry)).join("\n") + "\n";
 
-    // Use async IIFE to handle file appending
+    // Use async IIFE to handle file writing
     (async () => {
       try {
-        // Append to file instead of overwriting using Bun's file API
+        // Write to the unique file (append mode since we have a unique file each run)
         const file = Bun.file(this.logFile);
         const existingContent = (await file.exists()) ? await file.text() : "";
         const newContent = existingContent + logData;

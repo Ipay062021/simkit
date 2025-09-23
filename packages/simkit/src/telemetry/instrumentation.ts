@@ -10,6 +10,8 @@ export interface TelemetryConfig {
   OTELEndpoint?: string;
   /** Service name for telemetry identification */
   serviceName?: string;
+  /** Whether to append to existing file (true) or create separate files with incremental numbers (false). Default: false */
+  appendToFile?: boolean;
 }
 
 // Initialize telemetry with comprehensive OpenTelemetry data collection
@@ -18,6 +20,7 @@ export function initTelemetry(config: TelemetryConfig = {}) {
     logFile = "./telemetry.jsonl",
     OTELEndpoint,
     serviceName = "simkit",
+    appendToFile = false,
   } = config;
 
   // Choose exporter based on configuration
@@ -33,8 +36,10 @@ export function initTelemetry(config: TelemetryConfig = {}) {
     logMessage = `🚀 Telemetry initialized - sending to ${OTELEndpoint}`;
   } else {
     // Use custom file exporter for local logging
-    traceExporter = new FileLogDrainExporter(logFile);
-    logMessage = `🚀 Telemetry initialized - logging to ${logFile}`;
+    const fileExporter = new FileLogDrainExporter(logFile, appendToFile);
+    traceExporter = fileExporter;
+    // Access the actual filename that will be used (including any _x suffix)
+    logMessage = `🚀 Telemetry initialized - logging to ${fileExporter.getLogFile()}`;
   }
 
   const sdk = new NodeSDK({
