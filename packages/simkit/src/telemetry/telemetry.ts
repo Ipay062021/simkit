@@ -138,11 +138,20 @@ export class FileLogDrainExporter {
     })();
   }
 
-  shutdown(): Promise<void> {
-    return Promise.resolve();
+  async shutdown(): Promise<void> {
+    // Force flush any remaining data before shutdown
+    await this.forceFlush();
+    console.log("📁 FileLogDrainExporter shutdown completed");
   }
 
-  forceFlush(): Promise<void> {
-    return Promise.resolve();
+  async forceFlush(): Promise<void> {
+    // In our implementation, we write immediately, so no buffering to flush
+    // But we can add a small delay to ensure any pending async operations complete
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        console.log("💾 FileLogDrainExporter flush completed");
+        resolve();
+      }, 100);
+    });
   }
 }

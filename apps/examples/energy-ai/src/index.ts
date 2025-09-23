@@ -1,5 +1,5 @@
 import { createSimulation, type LoopState } from "@fallom/simkit/simulation";
-import { initTelemetry } from "@fallom/simkit";
+import { initTelemetry, shutdownTelemetry } from "@fallom/simkit";
 import { runEnergyAgent } from "./agent";
 import { createStatePrompt } from "./prompts";
 
@@ -84,7 +84,12 @@ export async function runEnergyAISimulation() {
     },
   });
 
-  return await simulation.run();
+  const result = await simulation.run();
+
+  // Ensure all telemetry data is flushed before exiting
+  await shutdownTelemetry();
+
+  return result;
 }
 
 // Run if executed directly

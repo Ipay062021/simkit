@@ -3,6 +3,9 @@ import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentation
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { FileLogDrainExporter } from "./telemetry";
 
+// Global reference to the SDK for shutdown operations
+let globalSDK: NodeSDK | null = null;
+
 export interface TelemetryConfig {
   /** File path for local telemetry logs (default: "./telemetry.jsonl") */
   logFile?: string;
@@ -64,5 +67,46 @@ export function initTelemetry(config: TelemetryConfig = {}) {
   console.log(logMessage);
   sdk.start();
 
+  // Store global reference for shutdown operations
+  globalSDK = sdk;
+
+  // Add graceful shutdown handlers to ensure telemetry data is flushed
+  const gracefulShutdown = async (signal: string) => {
+    console.log(`\n📊 ${signal} received, flushing telemetry data...`);
+    try {
+      await sdk.shutdown();
+      console.log("✅ Telemetry shutdown completed");
+    } catch (error) {
+      console.error("❌ Error during telemetry shutdown:", error);
+    }
+    process.exit(0);
+  };
+
+  // Handle various exit signals
+  process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+  process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+  process.on("beforeExit", async () => {
+    try {
+      await sdk.shutdown();
+    } catch (error) {
+      console.error("❌ Error during telemetry shutdown on beforeExit:", error);
+    }
+  });
+
   return sdk;
+}
+
+// Function to manually flush and shutdown telemetry
+export async function shutdownTelemetry(): Promise<void> {
+  if (globalSDK) {
+    console.log("📊 Flushing telemetry data...");
+    try {
+      await globalSDK.shutdown();
+      console.log("✅ Telemetry shutdown completed");
+      globalSDK = null;
+    } catch (error) {
+      console.error("❌ Error during telemetry shutdown:", error);
+      throw error;
+    }
+  }
 }
